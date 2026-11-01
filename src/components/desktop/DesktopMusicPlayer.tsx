@@ -8,11 +8,16 @@ export const DesktopMusicPlayer: React.FC = () => {
     volume, 
     isMuted, 
     activeSource,
-    youtubeVideoId, 
+    currentTrackIndex,
+    currentTrack,
+    playlist,
     isDesktopWidgetVisible,
     togglePlay, 
     setVolume, 
-    toggleMute 
+    toggleMute,
+    selectTrack,
+    nextTrack,
+    previousTrack
   } = useBackgroundMusic();
 
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -23,6 +28,7 @@ export const DesktopMusicPlayer: React.FC = () => {
   }
 
   const volPercentage = Math.round(volume * 100);
+  const playlistParam = playlist.map(t => t.id).join(',');
 
   return (
     <div 
@@ -34,7 +40,7 @@ export const DesktopMusicPlayer: React.FC = () => {
         <div className="w98-titlebar bg-[#000080] flex justify-between items-center px-1.5 py-0.5 font-bold text-white text-[10.5px]">
           <div className="flex items-center gap-1.5 truncate">
             <span>🎵</span>
-            <span className="truncate">Windows Media Player - Renai Circulation</span>
+            <span className="truncate">Windows Media Player - {currentTrack.title}</span>
           </div>
 
           <div className="flex items-center gap-1 shrink-0">
@@ -62,12 +68,29 @@ export const DesktopMusicPlayer: React.FC = () => {
         {/* Content Body */}
         {!isCollapsed && (
           <div className="mt-1 space-y-1.5 p-1 bg-[#dfdfdf] border border-gray-400">
+            {/* Track Selector Dropdown */}
+            <div className="flex items-center gap-1 text-[10px]">
+              <span className="font-bold text-gray-700 shrink-0">Track {currentTrackIndex + 1}/{playlist.length}:</span>
+              <select
+                value={currentTrackIndex}
+                onChange={(e) => selectTrack(Number(e.target.value))}
+                className="w98-field flex-1 py-0.5 px-1 text-[10px] bg-white font-mono truncate"
+              >
+                {playlist.map((track, idx) => (
+                  <option key={track.id} value={idx}>
+                    {idx + 1}. {track.artist} - {track.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             {activeSource === 'youtube' ? (
-              /* Visible Standard YouTube Embed */
+              /* Visible Standard YouTube Embed with playlist looped */
               <div className="w98-inset bg-black p-0.5 relative overflow-hidden aspect-video">
                 <iframe
-                  src={`https://www.youtube.com/embed/${youtubeVideoId}?enablejsapi=1&autoplay=1&loop=1&playlist=${youtubeVideoId}&origin=${typeof window !== 'undefined' ? window.location.origin : ''}`}
-                  title="Renai Circulation Background Audio"
+                  key={currentTrack.id}
+                  src={`https://www.youtube.com/embed/${currentTrack.id}?enablejsapi=1&autoplay=1&loop=1&playlist=${playlistParam}&origin=${typeof window !== 'undefined' ? window.location.origin : ''}`}
+                  title={`${currentTrack.title} - ${currentTrack.artist}`}
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   allowFullScreen
                   className="yt-bg-stream-iframe w-full h-full border-0"
@@ -77,7 +100,7 @@ export const DesktopMusicPlayer: React.FC = () => {
               /* Retro Win98 Visualizer Screen for Local MP3 */
               <div className="w98-inset bg-black p-2.5 flex flex-col items-center justify-center gap-1.5 font-mono text-[#00ff00] h-28 shadow-inner">
                 <div className="text-[11px] font-bold tracking-wider text-center text-cyan-300 truncate w-full">
-                  RENAI CIRCULATION (*namirin)
+                  {currentTrack.title} ({currentTrack.artist})
                 </div>
                 <div className="text-[9.5px] text-emerald-400">
                   {isPlaying ? '● PLAYING • MP3 STEREO 44.1kHz' : '○ PAUSED'}
@@ -95,22 +118,43 @@ export const DesktopMusicPlayer: React.FC = () => {
               </div>
             )}
 
-            {/* Retro Player Controls Bar */}
+            {/* Retro Player Controls Bar with Previous/Next track buttons */}
             <div className="flex items-center justify-between gap-1 text-[10px] pt-0.5">
               <div className="flex items-center gap-1">
+                {/* Previous Track */}
+                <button
+                  type="button"
+                  onClick={() => previousTrack()}
+                  className="w98-btn px-1.5 py-0.5 font-bold text-[10px] border border-t-white border-l-white border-b-black border-r-black cursor-pointer"
+                  title="Previous Track"
+                >
+                  ⏮
+                </button>
+
+                {/* Play / Pause */}
                 <button
                   type="button"
                   onClick={() => togglePlay()}
                   className="w98-btn px-2 py-0.5 font-bold flex items-center gap-1 text-[10px] border border-t-white border-l-white border-b-black border-r-black cursor-pointer active:border-t-black active:border-l-black active:border-b-white active:border-r-white"
                 >
                   <span>{isPlaying ? '⏸' : '▶'}</span>
-                  <span>{isPlaying ? 'Pause' : 'Play'}</span>
                 </button>
 
+                {/* Next Track */}
+                <button
+                  type="button"
+                  onClick={() => nextTrack()}
+                  className="w98-btn px-1.5 py-0.5 font-bold text-[10px] border border-t-white border-l-white border-b-black border-r-black cursor-pointer"
+                  title="Next Track"
+                >
+                  ⏭
+                </button>
+
+                {/* Mute */}
                 <button
                   type="button"
                   onClick={() => toggleMute()}
-                  className={`w98-btn px-2 py-0.5 font-bold text-[10px] border border-t-white border-l-white border-b-black border-r-black cursor-pointer ${
+                  className={`w98-btn px-1.5 py-0.5 font-bold text-[10px] border border-t-white border-l-white border-b-black border-r-black cursor-pointer ${
                     isMuted ? 'bg-red-100 text-red-900' : ''
                   }`}
                   title={isMuted ? 'Unmute' : 'Mute'}
@@ -120,7 +164,7 @@ export const DesktopMusicPlayer: React.FC = () => {
               </div>
 
               {/* Volume Slider */}
-              <div className="flex items-center gap-1.5 flex-1 max-w-[130px]">
+              <div className="flex items-center gap-1.5 flex-1 max-w-[110px]">
                 <span className="text-[9px] font-mono text-gray-700">{volPercentage}%</span>
                 <input
                   type="range"
@@ -134,15 +178,15 @@ export const DesktopMusicPlayer: React.FC = () => {
               </div>
             </div>
 
-            {/* Status Footer & Source Switcher */}
+            {/* Status Footer & Mode Switcher */}
             <div className="w98-inset bg-white p-1 text-[9px] font-mono flex items-center justify-between text-gray-700">
               <span className="text-[#000080] font-bold truncate">
-                MODE: {activeSource === 'local' ? 'Local MP3' : 'YouTube Stream'}
+                🔂 LOOP: ON • {activeSource === 'local' ? 'Local MP3' : 'YouTube Stream'}
               </span>
               <button
                 type="button"
                 onClick={() => backgroundMusic.setSource(activeSource === 'local' ? 'youtube' : 'local')}
-                className="text-[9px] text-blue-900 hover:underline font-sans cursor-pointer"
+                className="text-[9px] text-blue-900 hover:underline font-sans cursor-pointer shrink-0 ml-1"
               >
                 Switch to {activeSource === 'local' ? 'YouTube' : 'MP3'} ⇄
               </button>

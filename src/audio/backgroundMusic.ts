@@ -1,13 +1,35 @@
 /**
  * Single Shared Background Music Controller
- * Supports:
- * 1. Direct YouTube streaming (videoId: uKxyLmbOc0Q - Renai Circulation) with zero file download needed!
- * 2. Optional local MP3 (/audio/community-theme.mp3)
- * - Initial volume: 20% (0.20)
- * - Loops continuously
- * - Never restarts when opening/closing windows
- * - Accessible from taskbar tray and desktop player widget
+ * Manages official looped playlist streaming via YouTube:
+ * 1. YOASOBI - Idol (ZRtdQ81jPUQ)
+ * 2. Bambee - Bumble Bee (jyFivH9gxz0)
+ * 3. 結束バンド - Guitar, Loneliness and Blue Planet (B7BxrAAXl94)
+ * 4. MAISONdes - Tokyo Shandy Rendezvous (NFMmSOWPj_k)
+ * 5. LiSA - Akeboshi (yGcm81aaTHg)
+ * 6. millennium parade × Sheena Ringo - W●RK (dYzgZVhiqmU)
+ * 7. ALI - LOST IN PARADISE (tLsJQ5srVQA)
+ * 8. *namirin - Renai Circulation (uKxyLmbOc0Q)
+ *
+ * Loops continuously, starts automatically on user interaction,
+ * and never restarts when windows open/close.
  */
+
+export interface TrackMeta {
+  id: string;
+  title: string;
+  artist: string;
+}
+
+export const COMMUNITY_PLAYLIST: TrackMeta[] = [
+  { id: 'ZRtdQ81jPUQ', title: 'Idol (アイドル)', artist: 'YOASOBI' },
+  { id: 'jyFivH9gxz0', title: 'Bumble Bee', artist: 'Bambee' },
+  { id: 'B7BxrAAXl94', title: 'Guitar, Loneliness and Blue Planet', artist: '結束バンド (Kessoku Band)' },
+  { id: 'NFMmSOWPj_k', title: 'Tokyo Shandy Rendezvous', artist: 'MAISONdes ft. KAF & Tsumiki' },
+  { id: 'yGcm81aaTHg', title: 'Akeboshi (あけぼし)', artist: 'LiSA' },
+  { id: 'dYzgZVhiqmU', title: 'W●RK', artist: 'millennium parade × Sheena Ringo' },
+  { id: 'tLsJQ5srVQA', title: 'LOST IN PARADISE', artist: 'ALI ft. AKLO' },
+  { id: 'uKxyLmbOc0Q', title: 'Renai Circulation', artist: '*namirin' }
+];
 
 export interface MusicState {
   isPlaying: boolean;
@@ -16,7 +38,8 @@ export interface MusicState {
   hasError: boolean;
   errorMessage: string | null;
   activeSource: 'youtube' | 'local';
-  youtubeVideoId: string;
+  currentTrackIndex: number;
+  currentTrack: TrackMeta;
   isDesktopWidgetVisible: boolean;
 }
 
@@ -26,12 +49,13 @@ class BackgroundMusicController {
   private audio: HTMLAudioElement | null = null;
   private state: MusicState = {
     isPlaying: false,
-    volume: 0.2, // Exactly 20%
+    volume: 0.2, // 20%
     isMuted: false,
     hasError: false,
     errorMessage: null,
-    activeSource: 'local', // Primary local MP3 with seamless YouTube fallback
-    youtubeVideoId: 'uKxyLmbOc0Q',
+    activeSource: 'youtube', // Default to streaming the 7-song looped playlist directly
+    currentTrackIndex: 0,
+    currentTrack: COMMUNITY_PLAYLIST[0],
     isDesktopWidgetVisible: true
   };
   private subscribers = new Set<MusicSubscriber>();
@@ -56,6 +80,15 @@ class BackgroundMusicController {
         this.state.isMuted = savedMute === 'true';
       }
 
+      const savedIdx = localStorage.getItem('ihn_bg_track_index');
+      if (savedIdx !== null) {
+        const idx = parseInt(savedIdx, 10);
+        if (!isNaN(idx) && idx >= 0 && idx < COMMUNITY_PLAYLIST.length) {
+          this.state.currentTrackIndex = idx;
+          this.state.currentTrack = COMMUNITY_PLAYLIST[idx];
+        }
+      }
+
       const savedSource = localStorage.getItem('ihn_bg_music_source');
       if (savedSource === 'local' || savedSource === 'youtube') {
         this.state.activeSource = savedSource;
@@ -65,7 +98,7 @@ class BackgroundMusicController {
     }
   }
 
-  private sendYouTubeCommand(func: string, args: unknown = '') {
+  public sendYouTubeCommand(func: string, args: unknown = '') {
     if (typeof document === 'undefined') return;
     const iframes = document.querySelectorAll<HTMLIFrameElement>('iframe.yt-bg-stream-iframe');
     iframes.forEach((iframe) => {
@@ -95,11 +128,11 @@ class BackgroundMusicController {
       });
 
       this.audio.addEventListener('error', () => {
-        // If local audio fails, fall back to YouTube streaming seamlessly
+        // Fall back to YouTube streaming playlist seamlessly
         this.updateState({ 
           activeSource: 'youtube',
           hasError: false,
-          errorMessage: null
+          errorMessage: null 
         });
       });
     }
@@ -146,6 +179,33 @@ class BackgroundMusicController {
     } catch {}
   }
 
+  public selectTrack(index: number) {
+    if (index < 0 || index >= COMMUNITY_PLAYLIST.length) return;
+    const track = COMMUNITY_PLAYLIST[index];
+    this.updateState({
+      currentTrackIndex: index,
+      currentTrack: track,
+      isPlaying: true
+    });
+    try {
+      localStorage.setItem('ihn_bg_track_index', index.toString());
+    } catch {}
+
+    if (this.state.activeSource === 'youtube') {
+      this.sendYouTubeCommand('playVideoAt', index);
+    }
+  }
+
+  public nextTrack() {
+    const nextIdx = (this.state.currentTrackIndex + 1) % COMMUNITY_PLAYLIST.length;
+    this.selectTrack(nextIdx);
+  }
+
+  public previousTrack() {
+    const prevIdx = (this.state.currentTrackIndex - 1 + COMMUNITY_PLAYLIST.length) % COMMUNITY_PLAYLIST.length;
+    this.selectTrack(prevIdx);
+  }
+
   /**
    * Start music from a user interaction (such as clicking the welcome button)
    */
@@ -153,7 +213,6 @@ class BackgroundMusicController {
     this.updateState({ isDesktopWidgetVisible: true, isPlaying: true });
 
     if (this.state.activeSource === 'youtube') {
-      // Send play command to YouTube iframe with 20% volume
       this.sendYouTubeCommand('setVolume', Math.round(this.state.volume * 100));
       if (this.state.isMuted) {
         this.sendYouTubeCommand('mute');
@@ -170,7 +229,6 @@ class BackgroundMusicController {
         this.updateState({ isPlaying: true, hasError: false, errorMessage: null });
         return true;
       } catch {
-        // Fall back to YouTube stream
         this.setSource('youtube');
         this.sendYouTubeCommand('playVideo');
         return true;
