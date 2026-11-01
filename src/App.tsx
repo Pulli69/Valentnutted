@@ -13,6 +13,7 @@ import { NotificationBalloon } from './components/notifications/NotificationBall
 import { DesktopChatPreview } from './components/desktop/DesktopChatPreview';
 import { FoldConfirmDialog } from './components/common/FoldConfirmDialog';
 import { CascadingCrashAnimation } from './components/common/CascadingCrashAnimation';
+import { WelcomeDialog } from './components/common/WelcomeDialog';
 import { sound } from './audio/soundEngine';
 import type { PublicChatMessage } from './lib/supabase';
 
@@ -94,6 +95,9 @@ const OSDesktop: React.FC = () => {
 
       {/* Relapse Confirmation Modal Dialog */}
       <FoldConfirmDialog />
+
+      {/* First-Visit Community Welcome Screen */}
+      <WelcomeDialog />
 
       {/* Cascading Crash Error Waterfall Dialogs */}
       {showCascadingCrash && (

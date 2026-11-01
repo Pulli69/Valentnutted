@@ -17,6 +17,7 @@ import {
   EmergencyPlayerIcon,
   UserAccountIcon
 } from '../icons/PixelIcons';
+import { MusicTrayControl } from './MusicTrayControl';
 
 export const Taskbar: React.FC = () => {
   const { 
@@ -129,6 +130,9 @@ export const Taskbar: React.FC = () => {
         <div title="NutGuard Network Protection: Active" className="cursor-default flex items-center">
           <NetworkIcon size={14} />
         </div>
+
+        {/* Background Music Controller */}
+        <MusicTrayControl />
 
         {/* Sound Toggle (Speaker icon) */}
         <button
