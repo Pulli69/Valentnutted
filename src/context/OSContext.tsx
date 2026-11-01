@@ -88,19 +88,30 @@ export const OSProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   const [streakState, setStreakState] = useState<StreakState>(() => {
     try {
       const saved = localStorage.getItem('ihn_streak_state');
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        // If it was the legacy mock default (1 day default, 3 urges, or legacy unstarted mock), reset to clean 0-day start
+        if (
+          (parsed.currentStreakDays === 1 && parsed.urgesResisted === 3 && parsed.totalCheckIns === 1) ||
+          (parsed.currentStreakDays === 1 && !parsed.lastCheckInDate)
+        ) {
+          // fall through to clean 0-day initial state
+        } else {
+          return parsed;
+        }
+      }
     } catch {}
     return {
       startDate: new Date().toISOString(),
-      currentStreakDays: 1,
+      currentStreakDays: 0,
       lastCheckInDate: null,
-      totalCheckIns: 1,
-      highestStreak: 1,
-      urgesResisted: 3,
+      totalCheckIns: 0,
+      highestStreak: 0,
+      urgesResisted: 0,
       foldedCount: 0,
       todayStatus: 'pending',
       isCloudVerified: false,
-      milestones: ['Day 1: The Awakening']
+      milestones: []
     };
   });
 

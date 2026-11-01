@@ -27,14 +27,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [profile, setProfile] = useState<UserProfile | null>(() => {
     try {
       const saved = localStorage.getItem('ihn_guest_profile');
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.current_streak === 1 && parsed.highest_streak === 1 && parsed.id === 'local-guest') {
+          parsed.current_streak = 0;
+          parsed.highest_streak = 0;
+        }
+        return parsed;
+      }
     } catch {}
     const localAvatar = localStorage.getItem('ihn_custom_avatar') || undefined;
     return {
       id: 'local-guest',
       username: 'Guest_Survivor_' + Math.floor(1000 + Math.random() * 9000),
-      current_streak: 1,
-      highest_streak: 1,
+      current_streak: 0,
+      highest_streak: 0,
       is_leaderboard_public: false,
       avatar_url: localAvatar
     };
@@ -66,8 +73,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           .insert({
             id: userId,
             username: newName,
-            current_streak: 1,
-            highest_streak: 1,
+            current_streak: 0,
+            highest_streak: 0,
             is_leaderboard_public: false,
           })
           .select()
@@ -108,8 +115,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setProfile({
           id: 'local-guest',
           username: 'Guest_Survivor_' + Math.floor(1000 + Math.random() * 9000),
-          current_streak: 1,
-          highest_streak: 1,
+          current_streak: 0,
+          highest_streak: 0,
           is_leaderboard_public: false,
         });
       }

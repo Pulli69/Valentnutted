@@ -327,7 +327,7 @@ export const StreakTrackerApp: React.FC = () => {
             { day: 21, name: 'Day 21: God Mode', desc: 'Habit loops rewritten. Deep stillness and focus.' },
             { day: 30, name: 'Day 30: Nirvana Overlord', desc: 'Complete November conquest. Immortality achieved.' }
           ].map(m => {
-            const unlocked = Math.max(streakState.highestStreak || 1, streakState.currentStreakDays || 0) >= m.day;
+            const unlocked = Math.max(streakState.highestStreak || 0, streakState.currentStreakDays || 0) >= m.day;
             return (
               <div 
                 key={m.day} 

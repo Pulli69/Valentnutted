@@ -55,9 +55,9 @@ export const UserAccountApp: React.FC = () => {
 
   // Authoritative highest streak for milestone persistence
   const effectiveMaxStreak = Math.max(
-    streakState.highestStreak || 1, 
+    streakState.highestStreak || 0, 
     streakState.currentStreakDays || 0,
-    profile?.highest_streak || 1
+    profile?.highest_streak || 0
   );
 
   const handleUpdateName = async (e: React.FormEvent) => {
