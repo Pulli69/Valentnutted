@@ -7,6 +7,7 @@ export const DesktopMusicPlayer: React.FC = () => {
     isPlaying, 
     volume, 
     isMuted, 
+    activeSource,
     youtubeVideoId, 
     isDesktopWidgetVisible,
     togglePlay, 
@@ -61,16 +62,38 @@ export const DesktopMusicPlayer: React.FC = () => {
         {/* Content Body */}
         {!isCollapsed && (
           <div className="mt-1 space-y-1.5 p-1 bg-[#dfdfdf] border border-gray-400">
-            {/* Visible Standard YouTube Embed (100% compliant with YouTube terms & controls) */}
-            <div className="w98-inset bg-black p-0.5 relative overflow-hidden aspect-video">
-              <iframe
-                src={`https://www.youtube.com/embed/${youtubeVideoId}?enablejsapi=1&autoplay=1&loop=1&playlist=${youtubeVideoId}&origin=${typeof window !== 'undefined' ? window.location.origin : ''}`}
-                title="Renai Circulation Background Audio"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-                className="yt-bg-stream-iframe w-full h-full border-0"
-              />
-            </div>
+            {activeSource === 'youtube' ? (
+              /* Visible Standard YouTube Embed */
+              <div className="w98-inset bg-black p-0.5 relative overflow-hidden aspect-video">
+                <iframe
+                  src={`https://www.youtube.com/embed/${youtubeVideoId}?enablejsapi=1&autoplay=1&loop=1&playlist=${youtubeVideoId}&origin=${typeof window !== 'undefined' ? window.location.origin : ''}`}
+                  title="Renai Circulation Background Audio"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  className="yt-bg-stream-iframe w-full h-full border-0"
+                />
+              </div>
+            ) : (
+              /* Retro Win98 Visualizer Screen for Local MP3 */
+              <div className="w98-inset bg-black p-2.5 flex flex-col items-center justify-center gap-1.5 font-mono text-[#00ff00] h-28 shadow-inner">
+                <div className="text-[11px] font-bold tracking-wider text-center text-cyan-300 truncate w-full">
+                  RENAI CIRCULATION (*namirin)
+                </div>
+                <div className="text-[9.5px] text-emerald-400">
+                  {isPlaying ? '● PLAYING • MP3 STEREO 44.1kHz' : '○ PAUSED'}
+                </div>
+                {/* Visualizer bars */}
+                <div className="flex items-end gap-1.5 h-8 pt-1">
+                  <span className={`w-2.5 bg-emerald-500 ${isPlaying ? 'h-5 animate-pulse' : 'h-1'}`} />
+                  <span className={`w-2.5 bg-emerald-400 ${isPlaying ? 'h-7 animate-bounce' : 'h-1'}`} style={{ animationDuration: '0.6s' }} />
+                  <span className={`w-2.5 bg-cyan-400 ${isPlaying ? 'h-4 animate-pulse' : 'h-1'}`} />
+                  <span className={`w-2.5 bg-emerald-300 ${isPlaying ? 'h-8 animate-bounce' : 'h-1'}`} style={{ animationDuration: '0.8s' }} />
+                  <span className={`w-2.5 bg-emerald-400 ${isPlaying ? 'h-6 animate-pulse' : 'h-1'}`} />
+                  <span className={`w-2.5 bg-cyan-300 ${isPlaying ? 'h-3 animate-bounce' : 'h-1'}`} style={{ animationDuration: '0.5s' }} />
+                  <span className={`w-2.5 bg-emerald-500 ${isPlaying ? 'h-5 animate-pulse' : 'h-1'}`} />
+                </div>
+              </div>
+            )}
 
             {/* Retro Player Controls Bar */}
             <div className="flex items-center justify-between gap-1 text-[10px] pt-0.5">
@@ -111,10 +134,18 @@ export const DesktopMusicPlayer: React.FC = () => {
               </div>
             </div>
 
-            {/* Status Footer */}
+            {/* Status Footer & Source Switcher */}
             <div className="w98-inset bg-white p-1 text-[9px] font-mono flex items-center justify-between text-gray-700">
-              <span className="text-[#000080] font-bold truncate">STREAM: YouTube Direct (No download)</span>
-              <span>VOL: 20% (Default)</span>
+              <span className="text-[#000080] font-bold truncate">
+                MODE: {activeSource === 'local' ? 'Local MP3' : 'YouTube Stream'}
+              </span>
+              <button
+                type="button"
+                onClick={() => backgroundMusic.setSource(activeSource === 'local' ? 'youtube' : 'local')}
+                className="text-[9px] text-blue-900 hover:underline font-sans cursor-pointer"
+              >
+                Switch to {activeSource === 'local' ? 'YouTube' : 'MP3'} ⇄
+              </button>
             </div>
           </div>
         )}

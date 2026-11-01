@@ -30,9 +30,9 @@ class BackgroundMusicController {
     isMuted: false,
     hasError: false,
     errorMessage: null,
-    activeSource: 'youtube', // Default to streaming YouTube so no MP3 download is needed!
+    activeSource: 'local', // Primary local MP3 with seamless YouTube fallback
     youtubeVideoId: 'uKxyLmbOc0Q',
-    isDesktopWidgetVisible: false
+    isDesktopWidgetVisible: true
   };
   private subscribers = new Set<MusicSubscriber>();
   private audioSrc = '/audio/community-theme.mp3';
