@@ -144,7 +144,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const { data, error } = await supabase.auth.signInAnonymously();
       if (error) {
-        setAuthError(error.message);
+        const isAnonDisabled = error.message.toLowerCase().includes('anonymous') || error.message.toLowerCase().includes('disabled');
+        setAuthError(
+          isAnonDisabled
+            ? 'Anonymous sign-ins are disabled in Supabase. In Supabase Dashboard, go to Authentication > Providers > Anonymous and toggle "Enable Anonymous Sign-Ins" ON.'
+            : error.message
+        );
         return false;
       }
       if (data.user) {

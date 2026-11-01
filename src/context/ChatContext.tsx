@@ -297,23 +297,13 @@ export const ChatProvider: React.FC<{
     let currentUserId = user?.id;
     if (!currentUserId) {
       setIsSending(true);
-      addSystemNotice('*** Initiating guest network logon...', '#000080');
       const anonSuccess = await signInAnonymously();
-      if (!anonSuccess) {
-        setIsSending(false);
-        addSystemNotice('*** [AUTH REQUIRED]: You must logon to transmit messages.', '#800000');
-        sound.playError();
-        return { success: false, error: 'Authentication required' };
+      if (anonSuccess) {
+        const { data: { session } } = await client.auth.getSession();
+        currentUserId = session?.user?.id;
       }
-
-      const { data: { session } } = await client.auth.getSession();
-      currentUserId = session?.user?.id;
-      if (!currentUserId) {
-        setIsSending(false);
-        addSystemNotice('*** [AUTH ERROR]: Authentication token could not be verified.', '#800000');
-        sound.playError();
-        return { success: false, error: 'Verification failed' };
-      }
+      // If anonymous login failed (e.g. disabled in Supabase), we continue
+      // and attempt direct guest insert (compatible with Migration 04)
     }
 
     setIsSending(true);
@@ -321,10 +311,11 @@ export const ChatProvider: React.FC<{
       const { data, error } = await client
         .from('chat_messages')
         .insert({
-          user_id: currentUserId,
-          username: profile?.username || 'Survivor',
+          user_id: currentUserId || null,
+          username: profile?.username || 'Guest_' + Math.floor(1000 + Math.random() * 9000),
           message: cleanText,
           avatar_color: profile?.avatar_color || '#000080',
+          avatar_url: profile?.avatar_url || null,
           rank: profile?.rank || ''
         })
         .select()
@@ -342,6 +333,18 @@ export const ChatProvider: React.FC<{
           sound.playError();
           return { success: false, error: 'Rate limit: wait 3 seconds' };
         }
+
+        if (
+          error.message.includes('violates row-level security policy') ||
+          error.message.includes('null value in column "user_id"') ||
+          error.message.includes('foreign key constraint') ||
+          error.message.includes('Anonymous')
+        ) {
+          addSystemNotice('*** [GUEST ACCESS]: Enable "Anonymous Sign-Ins" in Supabase Dashboard (Authentication > Providers > Anonymous) or run Migration 04.', '#800000');
+          sound.playError();
+          return { success: false, error: 'Anonymous access disabled in Supabase' };
+        }
+
         addSystemNotice(`*** Transmission rejected: ${error.message}`, '#800000');
         sound.playError();
         return { success: false, error: error.message };

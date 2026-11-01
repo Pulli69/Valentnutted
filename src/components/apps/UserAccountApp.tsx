@@ -625,8 +625,17 @@ export const UserAccountApp: React.FC = () => {
           )}
 
           {authError && (
-            <div className="w98-inset bg-red-100 text-red-900 p-2 border border-red-500 font-semibold text-[10px]">
-              Error: {authError}
+            <div className="w98-inset bg-red-100 text-red-900 p-2 border border-red-500 font-semibold text-[10px] space-y-1">
+              <div className="flex justify-between items-start gap-2">
+                <span>⚠️ Error: {authError}</span>
+                <button
+                  type="button"
+                  onClick={clearAuthError}
+                  className="w98-btn px-1.5 py-0 text-[9px] text-gray-700 font-bold shrink-0"
+                >
+                  ✕
+                </button>
+              </div>
             </div>
           )}
 
