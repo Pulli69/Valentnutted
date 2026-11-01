@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useBackgroundMusic } from '../../hooks/useBackgroundMusic';
+import { backgroundMusic } from '../../audio/backgroundMusic';
 import { useOS } from '../../context/OSContext';
 
 export const MusicTrayControl: React.FC = () => {
@@ -141,8 +142,20 @@ export const MusicTrayControl: React.FC = () => {
               </div>
             </div>
 
-            {/* Visible YouTube Video Option */}
-            <div className="pt-1 border-t border-gray-300">
+            {/* Desktop Widget & Video Player Options */}
+            <div className="pt-1 border-t border-gray-300 space-y-1">
+              <button
+                type="button"
+                onClick={() => {
+                  backgroundMusic.setDesktopWidgetVisible(true);
+                  setIsOpen(false);
+                }}
+                className="w-full w98-btn py-1 text-[10px] text-[#000080] font-bold flex items-center justify-center gap-1.5 border border-t-white border-l-white border-b-black border-r-black cursor-pointer hover:bg-gray-100"
+              >
+                <span>📻</span>
+                <span>Open Desktop Music Player</span>
+              </button>
+
               <button
                 type="button"
                 onClick={() => {
@@ -152,7 +165,7 @@ export const MusicTrayControl: React.FC = () => {
                 className="w-full w98-btn py-1 text-[10px] text-gray-800 flex items-center justify-center gap-1.5 border border-t-white border-l-white border-b-black border-r-black cursor-pointer hover:bg-gray-100"
               >
                 <span>📺</span>
-                <span>Open Video Player (YouTube)</span>
+                <span>Open Full Video Player (YouTube)</span>
               </button>
             </div>
           </div>

@@ -11,6 +11,7 @@ import { BSOD } from './components/bsod/BSOD';
 import { BootSequence } from './components/boot/BootSequence';
 import { NotificationBalloon } from './components/notifications/NotificationBalloon';
 import { DesktopChatPreview } from './components/desktop/DesktopChatPreview';
+import { DesktopMusicPlayer } from './components/desktop/DesktopMusicPlayer';
 import { FoldConfirmDialog } from './components/common/FoldConfirmDialog';
 import { CascadingCrashAnimation } from './components/common/CascadingCrashAnimation';
 import { WelcomeDialog } from './components/common/WelcomeDialog';
@@ -85,6 +86,9 @@ const OSDesktop: React.FC = () => {
 
       {/* Persistent Desktop Chat Preview Widget (Visible by default on desktop) */}
       <DesktopChatPreview />
+
+      {/* Windows 98 Media Player Streaming Renai Circulation */}
+      <DesktopMusicPlayer />
 
       {/* Active Windows */}
       {windows.map((win) => (
