@@ -1,0 +1,275 @@
+/* =========================================================
+   AUTHENTIC WINDOWS 98 / CLASSIC RETRO DESKTOP STYLES
+   Pixel-accurate bevels, typography, scrollbars and cursors
+   ========================================================= */
+
+
+:root {
+  --w98-bg: #c0c0c0;
+  --w98-desktop-teal: #008080;
+  --w98-white: #ffffff;
+  --w98-light-grey: #dfdfdf;
+  --w98-dark-grey: #808080;
+  --w98-black: #000000;
+  --w98-navy-start: #000080;
+  --w98-navy-end: #1084d0;
+  --w98-inactive-start: #808080;
+  --w98-inactive-end: #b5b5b5;
+  --w98-selection: #000080;
+  --w98-selection-text: #ffffff;
+  --w98-tooltip: #ffffe1;
+  --w98-font: "Segoe UI", "MS Sans Serif", Tahoma, Geneva, Verdana, sans-serif;
+  --w98-pixel-font: "VT323", "Courier New", monospace;
+}
+
+* {
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: var(--w98-desktop-teal);
+  font-family: var(--w98-font);
+  font-size: 11px;
+  color: #000000;
+  image-rendering: pixelated;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ================== CLASSIC BEVELS ================== */
+
+/* 3D Outset (Window border, unpressed button, taskbar) */
+.w98-outset {
+  background-color: var(--w98-bg);
+  box-shadow: 
+    inset -1px -1px 0px var(--w98-black),
+    inset 1px 1px 0px var(--w98-white),
+    inset -2px -2px 0px var(--w98-dark-grey),
+    inset 2px 2px 0px var(--w98-light-grey);
+}
+
+/* 3D Inset (Sunken input, pressed button, status bar, sunken well) */
+.w98-inset {
+  background-color: var(--w98-bg);
+  box-shadow: 
+    inset 1px 1px 0px var(--w98-dark-grey),
+    inset -1px -1px 0px var(--w98-white),
+    inset 2px 2px 0px var(--w98-black),
+    inset -2px -2px 0px var(--w98-light-grey);
+}
+
+/* Deep sunken field (Text inputs, list boxes, textareas) */
+.w98-field {
+  background-color: var(--w98-white);
+  box-shadow: 
+    inset 1px 1px 0px var(--w98-dark-grey),
+    inset -1px -1px 0px var(--w98-white),
+    inset 2px 2px 0px var(--w98-black),
+    inset -2px -2px 0px var(--w98-light-grey);
+  color: #000000;
+  font-family: var(--w98-font);
+  font-size: 11px;
+  outline: none;
+}
+
+/* Buttons */
+.w98-btn {
+  background-color: var(--w98-bg);
+  color: #000000;
+  font-family: var(--w98-font);
+  font-size: 11px;
+  font-weight: 500;
+  border: none;
+  cursor: default;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 3px 12px;
+  min-height: 22px;
+  outline: none;
+  box-shadow: 
+    inset -1px -1px 0px var(--w98-black),
+    inset 1px 1px 0px var(--w98-white),
+    inset -2px -2px 0px var(--w98-dark-grey),
+    inset 2px 2px 0px var(--w98-light-grey);
+  transition: none;
+}
+
+.w98-btn:focus {
+  outline: 1px dotted #000000;
+  outline-offset: -4px;
+}
+
+.w98-btn:active, .w98-btn.active {
+  box-shadow: 
+    inset 1px 1px 0px var(--w98-black),
+    inset -1px -1px 0px var(--w98-white),
+    inset 2px 2px 0px var(--w98-dark-grey),
+    inset -2px -2px 0px var(--w98-light-grey);
+  padding: 4px 11px 2px 13px; /* authentic 1px down-right shift on active */
+}
+
+/* Window Titlebar Control Buttons */
+.w98-title-btn {
+  width: 16px;
+  height: 14px;
+  padding: 0;
+  min-height: 14px;
+  background-color: var(--w98-bg);
+  box-shadow: 
+    inset -1px -1px 0px var(--w98-black),
+    inset 1px 1px 0px var(--w98-white),
+    inset -2px -2px 0px var(--w98-dark-grey),
+    inset 2px 2px 0px var(--w98-light-grey);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: default;
+  font-size: 9px;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.w98-title-btn:active {
+  box-shadow: 
+    inset 1px 1px 0px var(--w98-black),
+    inset -1px -1px 0px var(--w98-white),
+    inset 2px 2px 0px var(--w98-dark-grey),
+    inset -2px -2px 0px var(--w98-light-grey);
+  transform: translate(1px, 1px);
+}
+
+/* Tabs */
+.w98-tab {
+  background-color: var(--w98-bg);
+  padding: 4px 10px;
+  border-top: 2px solid var(--w98-white);
+  border-left: 2px solid var(--w98-white);
+  border-right: 2px solid var(--w98-black);
+  cursor: default;
+  margin-right: 2px;
+  position: relative;
+  top: 1px;
+}
+
+.w98-tab.active {
+  background-color: var(--w98-bg);
+  font-weight: bold;
+  border-bottom: 2px solid var(--w98-bg);
+  top: 0px;
+  padding-bottom: 5px;
+  z-index: 2;
+}
+
+/* Authentic Checkbox & Radio */
+.w98-checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 13px;
+  height: 13px;
+  background-color: var(--w98-white);
+  box-shadow: 
+    inset 1px 1px 0px var(--w98-dark-grey),
+    inset -1px -1px 0px var(--w98-white),
+    inset 2px 2px 0px var(--w98-black),
+    inset -2px -2px 0px var(--w98-light-grey);
+  margin: 0;
+  cursor: default;
+  position: relative;
+}
+
+.w98-checkbox:checked::after {
+  content: '✔';
+  position: absolute;
+  top: -3px;
+  left: 1px;
+  font-size: 11px;
+  font-weight: bold;
+  color: #000000;
+}
+
+/* Authentic retro scrollbars */
+::-webkit-scrollbar {
+  width: 16px;
+  height: 16px;
+}
+
+::-webkit-scrollbar-track {
+  background: repeating-conic-gradient(#c0c0c0 0% 25%, #ffffff 0% 50%) 50% / 2px 2px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--w98-bg);
+  box-shadow: 
+    inset -1px -1px 0px var(--w98-black),
+    inset 1px 1px 0px var(--w98-white),
+    inset -2px -2px 0px var(--w98-dark-grey),
+    inset 2px 2px 0px var(--w98-light-grey);
+}
+
+::-webkit-scrollbar-button {
+  width: 16px;
+  height: 16px;
+  background-color: var(--w98-bg);
+  box-shadow: 
+    inset -1px -1px 0px var(--w98-black),
+    inset 1px 1px 0px var(--w98-white),
+    inset -2px -2px 0px var(--w98-dark-grey),
+    inset 2px 2px 0px var(--w98-light-grey);
+}
+
+/* Dotted focus */
+.w98-dotted-focus {
+  outline: 1px dotted #000000;
+}
+
+/* Marquee retro style */
+.w98-marquee {
+  background-color: #000000;
+  color: #00ff00;
+  font-family: var(--w98-pixel-font);
+  font-size: 16px;
+  padding: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* CRT Scanline overlay effect (subtle toggle) */
+.scanlines {
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%, 
+    rgba(0, 0, 0, 0.15) 50%
+  );
+  background-size: 100% 3px;
+  pointer-events: none;
+}
+
+/* Odometer / 7-Segment display */
+.w98-led-counter {
+  background-color: #000000;
+  color: #ff0000;
+  font-family: var(--w98-pixel-font);
+  font-size: 24px;
+  letter-spacing: 2px;
+  padding: 2px 6px;
+  border: 1px inset #808080;
+  box-shadow: inset 1px 1px 2px #000000;
+  display: inline-block;
+  line-height: 1;
+}
+
+.w98-led-counter.amber {
+  color: #ffaa00;
+}
+
+.w98-led-counter.green {
+  color: #00ff00;
+}
